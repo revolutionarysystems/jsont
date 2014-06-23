@@ -5,16 +5,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
 public class JSONTransformer {
 
-    public String transformFromFile(String source, File transform) throws IOException{
-        return transform(source, FileUtils.readFileToString(transform));
+    public String transformFromFile(String source, File transform, Map parameters) throws IOException{
+        return transform(source, FileUtils.readFileToString(transform), parameters);
     }
     
-    public String transform(String source, String transform){
+    public String transform(String source, String transform, Map parameters){
         JSONObject transformJSON = new JSONObject(transform);
         StringBuilder result = new StringBuilder();
         for(Object key: transformJSON.keySet()){
@@ -34,6 +35,12 @@ public class JSONTransformer {
                     placeholder = placeholder.substring(0, placeholder.indexOf("}}"));
                     Object replacement = JsonPath.read(match, placeholder);
                     partial = partial.replace("{{" + placeholder + "}}", replacement.toString());
+                }
+                while(partial.contains("${")){
+                    String placeholder = partial.substring(partial.indexOf("${")+2);
+                    placeholder = placeholder.substring(0, placeholder.indexOf("}"));
+                    Object replacement = parameters.get(placeholder);
+                    partial = partial.replace("${" + placeholder + "}", replacement.toString());
                 }
                 result.append(partial);
             }
