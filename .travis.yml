@@ -1,0 +1,5 @@
+language: java
+before_install: git clone http://github.com/revolutionarysystems/travis.git target/travis
+script: mvn deploy --settings target/travis/settings.xml
+env:
+  secure: D1c71f2hqOvHl1W54kz3mLRPfPrj2+mfTdtTtpL1KPRUi0k9Wmkh1UiJqBZDZM1kCMTtzk+fJQ/e22ShGDcQSR7ECMfm3ztxdgIs0a7uBfy+dzK7FmNK0cttPcz+55EwFMMw6pBPaUUX63LukxbmbwdExAY1MKCzPKGySTJpYNk=
