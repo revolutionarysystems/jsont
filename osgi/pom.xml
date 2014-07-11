@@ -63,7 +63,7 @@
                     <instructions>
                         <Bundle-SymbolicName>jsont</Bundle-SymbolicName>
                         <Export-Package>uk.co.revsys.jsont.*</Export-Package>
-                        <Import-Package>!org.slf4j.impl,*</Import-Package>
+                        <Import-Package>!org.slf4j.impl,!com.twitter.util,!org.jruby.*,!scala.*,!sun.misc,*</Import-Package>
                         <Embed-Dependency>*</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                     </instructions>
