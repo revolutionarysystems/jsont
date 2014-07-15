@@ -12,17 +12,22 @@ import org.apache.commons.io.FileUtils;
 
 public class JSONTemplater {
 
-    public String evaluateTemplate(String template, String json) {
-        MustacheFactory mustacheFactory = new DefaultMustacheFactory();
-        Mustache mustache = mustacheFactory.compile(new StringReader(template), "");
-        StringWriter writer = new StringWriter();
-        mustache.execute(writer, JSONValue.parse(json));
-        return writer.toString();
+    MustacheFactory mustacheFactory = new DefaultMustacheFactory();
+    
+    public String evaluateJSON(String json, String template) {
+        return evaluate(JSONValue.parse(json), template);
     }
     
-    public String evaluateTemplateFile(File templateFile, String json) throws IOException{
+    public String evaluateJSONUsingFile(String json, File templateFile) throws IOException{
         String template = FileUtils.readFileToString(templateFile);
-        return evaluateTemplate(template, json);
+        return evaluate(json, template);
+    }
+    
+    protected String evaluate(Object data, String template){
+        Mustache mustache = mustacheFactory.compile(new StringReader(template), "");
+        StringWriter writer = new StringWriter();
+        mustache.execute(writer, data);
+        return writer.toString();
     }
 
 }

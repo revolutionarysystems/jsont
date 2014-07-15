@@ -38,7 +38,7 @@ public class JSONTemplaterTest {
         String json = "{'p1': 'v1'}";
         JSONTemplater instance = new JSONTemplater();
         String expResult = "p1 = v1";
-        String result = instance.evaluateTemplate(template, json);
+        String result = instance.evaluateJSON(json, template);
         assertEquals(expResult, result);
     }
 
