@@ -67,8 +67,13 @@ public class JSONTransformer {
                 if (transformJSON.has(placeholder)) {
                     replacementString = transform(source, transformJSON, placeholder, parameters);
                 } else {
-                    Object replacement = JsonPath.read(match, placeholder);
-                    replacementString = parseObjectToString(replacement, wrappedInQuotes);
+                    try {
+                        Object replacement = JsonPath.read(match, placeholder);
+                        replacementString = parseObjectToString(replacement, wrappedInQuotes);
+                    }
+                    catch (com.jayway.jsonpath.PathNotFoundException ex){
+                        replacementString = "null";
+                    }
                 }
                 partial = partial.replace(prefix + placeholder + suffix, replacementString);
             }
