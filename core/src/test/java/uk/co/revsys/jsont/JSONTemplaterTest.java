@@ -28,10 +28,7 @@ public class JSONTemplaterTest {
     @After
     public void tearDown() {
     }
-
-    /**
-     * Test of evaluate method, of class JSONTemplater.
-     */
+    
     @Test
     public void testEvaluate() {
         String template = "p1 = {{p1}}";

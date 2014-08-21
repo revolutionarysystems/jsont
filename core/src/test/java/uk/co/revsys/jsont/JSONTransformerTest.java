@@ -54,6 +54,10 @@ public class JSONTransformerTest {
         expResult = "{\"firstName\": \"Test\", \"surname\": \"User\"}";
         result = instance.transform(source, transform, null);
         assertEquals(new JSONObject(expResult).toString(), new JSONObject(result).toString());
+        transform = "{\"$\": {\"id\": \"{{eval(v1 + v1, $.accountId)}}\"}}";
+        expResult = "{\"id\": 19752}";
+        result = instance.transform(source, transform, null);
+        assertEquals(new JSONObject(expResult).toString(), new JSONObject(result).toString());
     }
 
 

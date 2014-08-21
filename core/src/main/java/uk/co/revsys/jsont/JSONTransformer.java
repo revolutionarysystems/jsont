@@ -1,6 +1,5 @@
 package uk.co.revsys.jsont;
 
-import com.jayway.jsonpath.JsonPath;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -11,6 +10,8 @@ import org.json.JSONObject;
 
 public class JSONTransformer {
 
+    private JSONPathEvaluator jsonPathEvaluator = new JSONPathEvaluator();
+    
     public String transformFromFile(String source, File transform, Map parameters) throws IOException {
         return transform(source, FileUtils.readFileToString(transform), parameters);
     }
@@ -32,7 +33,7 @@ public class JSONTransformer {
         }
         StringBuilder result = new StringBuilder();
         List<String> matches = new LinkedList();
-        Object jmatch = JsonPath.read(source, jpath);
+        Object jmatch = jsonPathEvaluator.evaluate(source, jpath);
         if (jmatch instanceof net.minidev.json.JSONObject) {
             matches.add(jmatch.toString());
         } else {
@@ -68,7 +69,7 @@ public class JSONTransformer {
                     replacementString = transform(source, transformJSON, placeholder, parameters);
                 } else {
                     try {
-                        Object replacement = JsonPath.read(match, placeholder);
+                        Object replacement = jsonPathEvaluator.evaluate(match, placeholder);
                         replacementString = parseObjectToString(replacement, wrappedInQuotes);
                     }
                     catch (com.jayway.jsonpath.PathNotFoundException ex){

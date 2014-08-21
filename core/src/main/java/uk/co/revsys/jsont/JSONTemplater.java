@@ -20,7 +20,7 @@ public class JSONTemplater {
     
     public String evaluateJSONUsingFile(String json, File templateFile) throws IOException{
         String template = FileUtils.readFileToString(templateFile);
-        return evaluate(json, template);
+        return evaluateJSON(json, template);
     }
     
     protected String evaluate(Object data, String template){
