@@ -27,7 +27,12 @@
             <groupId>uk.co.revsys.jsont</groupId>
             <artifactId>jsont</artifactId>
             <version>${project.version}</version>
-        </dependency>  
+        </dependency>
+        <dependency>
+            <groupId>uk.co.revsys.esb</groupId>
+            <artifactId>esb-component</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency> 
 
         <!-- for testing -->
         <dependency>
