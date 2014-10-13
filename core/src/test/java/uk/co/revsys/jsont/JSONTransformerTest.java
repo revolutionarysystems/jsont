@@ -38,9 +38,9 @@ public class JSONTransformerTest {
     @Test
     public void testTransform() {
         String source = "{\"accountName\": \"Test Account\", \"accountId\": 9876, \"user\": {\"firstName\": \"Test\", \"surname\": \"User\"}}";
-        String transform = "{\"$\": {\"name\": \"{{$.accountName}}\", \"id\": \"{{$.accountId}}\", \"userid\": \"${userid}\", \"p1\": \"{{$.p1}}\", \"p2\": \"${p2}\"}}";
+        String transform = "{\"$\": {\"name\": \"{{$.accountName}}\", \"id\": \"{{$.accountId}}\", \"userid\": \"${userid}\", \"p1\": \"{{$.p1}}\", \"p2\": \"${p2}\", \"p3\": \"static\"}}";
         JSONTransformer instance = new JSONTransformer();
-        String expResult = "{\"name\": \"Test Account\", \"id\": 9876, \"userid\": \"1234\", \"p1\": null, \"p2\": null}";
+        String expResult = "{\"name\": \"Test Account\", \"id\": 9876, \"userid\": \"1234\", \"p1\": null, \"p2\": null, \"p3\": \"static\"}";
         Map parameters = new HashMap();
         parameters.put("userid", "1234");
         String result = instance.transform(source, transform, parameters);

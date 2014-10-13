@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import uk.co.revsys.esb.component.ParameterAwareProcessor;
 import uk.co.revsys.jsont.JSONTransformer;
 
-public class JSONTransformProcessor implements Processor{
+public class JSONTransformProcessor implements Processor, ParameterAwareProcessor{
 
     private JSONTransformer transformer = new JSONTransformer();
     
