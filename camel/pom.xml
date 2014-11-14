@@ -6,13 +6,13 @@
     <parent>
         <artifactId>jsont-parent</artifactId>
         <groupId>uk.co.revsys.jsont</groupId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0</version>
     </parent>
 
     <groupId>uk.co.revsys.jsont</groupId>
     <artifactId>jsont-camel</artifactId>
     <packaging>bundle</packaging>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
 
     <name>JSONT Camel</name>
 
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>uk.co.revsys.esb</groupId>
             <artifactId>esb-component</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.1.0</version>
         </dependency> 
 
         <!-- for testing -->
