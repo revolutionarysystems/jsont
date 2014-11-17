@@ -1,19 +1,16 @@
 package uk.co.revsys.jsont.camel;
 
 import java.util.Map;
+import org.apache.camel.Processor;
+import uk.co.revsys.esb.component.MappedProcessorComponent;
 
-import org.apache.camel.Endpoint;
-import org.apache.camel.impl.DefaultComponent;
-import org.apache.camel.impl.ProcessorEndpoint;
+public class JSONComponent extends MappedProcessorComponent {
 
-/**
- * Represents the component that manages {@link HelloWorldEndpoint}.
- */
-public class JSONComponent extends DefaultComponent {
-
-    protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
-        ProcessorEndpoint endpoint = new ProcessorEndpoint(uri, this, new JSONPathProcessor());
-        setProperties(endpoint.getProcessor(), parameters);
-        return endpoint;
+    @Override
+    protected void populateMappings(Map<String, Class<? extends Processor>> mappings) {
+        mappings.put("path", JSONPathProcessor.class);
+        mappings.put("transform", JSONTransformProcessor.class);
     }
+
+    
 }

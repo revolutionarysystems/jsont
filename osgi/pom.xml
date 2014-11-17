@@ -11,7 +11,7 @@
     <parent>
         <groupId>uk.co.revsys.jsont</groupId>
         <artifactId>jsont-parent</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -27,12 +27,7 @@
         <dependency>
             <groupId>uk.co.revsys.jsont</groupId>
             <artifactId>jsont</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core</artifactId>
-            <version>${camel-version}</version>
+            <version>0.2.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -68,8 +63,8 @@
                     <instructions>
                         <Bundle-SymbolicName>jsont</Bundle-SymbolicName>
                         <Export-Package>uk.co.revsys.jsont.*</Export-Package>
-                        <Import-Package>!org.slf4j.impl,!com.twitter.util,!org.jruby.*,!scala.*,!sun.misc,!org.jvnet.staxex,*</Import-Package>
-                        <Embed-Dependency>*</Embed-Dependency>
+                        <Import-Package>!org.slf4j.impl,!com.twitter.util,!org.jruby.*,!scala.*,!sun.misc,!org.jvnet.staxex,!org.apache.log.*,*</Import-Package>
+                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                     </instructions>
                 </configuration>
