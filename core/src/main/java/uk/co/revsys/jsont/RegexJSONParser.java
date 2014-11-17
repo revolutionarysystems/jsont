@@ -10,16 +10,12 @@ public class RegexJSONParser {
 //    public String parse(String input, String regex, String nameList){
     public String parseString(String input, String regex){
         Pattern parsePattern = Pattern.compile(regex);
-        System.out.println(input);
-        Matcher m = parsePattern.matcher(input);
+        Matcher m = parsePattern.matcher(input.trim());
         ArrayList<String>names = extractNames(regex);
-        System.out.println(m.toString());
-        System.out.println(names);
         if (m.matches()){
-            System.out.println("Match");
             StringBuilder json = new StringBuilder("{ ");
             for (String name : names){
-                json.append("\""+name+"\" : \""+m.group(name)+"\", ");
+                json.append("\""+name+"\" : \""+m.group(name).replace("\"", "\\\"")+"\", ");
             }
             if (json.length()>3){
                 json.delete(json.lastIndexOf(","), json.length());
@@ -27,7 +23,6 @@ public class RegexJSONParser {
             json.append(" }");
             return json.toString();
         } else {
-            System.out.println("No match");
             return null;
         }
     }
