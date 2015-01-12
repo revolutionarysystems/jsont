@@ -5,13 +5,14 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import net.minidev.json.JSONArray;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
 public class JSONTransformer {
 
     private JSONPathEvaluator jsonPathEvaluator = new JSONPathEvaluator();
-    
+
     public String transformFromFile(String source, File transform, Map parameters) throws IOException {
         return transform(source, FileUtils.readFileToString(transform), parameters);
     }
@@ -34,14 +35,21 @@ public class JSONTransformer {
         StringBuilder result = new StringBuilder();
         List<String> matches = new LinkedList();
         Object jmatch = jsonPathEvaluator.evaluate(source, jpath);
+        boolean resultIsArray = false;
         if (jmatch instanceof net.minidev.json.JSONObject) {
             matches.add(jmatch.toString());
+        } else if (jmatch instanceof net.minidev.json.JSONArray) {
+            JSONArray jsonArray = (JSONArray) jmatch;
+            for (Object item : jsonArray) {
+                matches.add(item.toString());
+            }
+            resultIsArray = true;
+            result.append("[");
         } else {
             matches = (List) jmatch;
         }
         for (String match : matches) {
             String partial = template;
-            System.out.println("partial = " + partial);
             while (partial.contains("{{")) {
                 boolean hasQuoteAtStart = false;
                 boolean hasQuoteAtEnd = false;
@@ -63,7 +71,6 @@ public class JSONTransformer {
                     }
                 }
                 placeholder = placeholder.substring(0, endIndex);
-                System.out.println("placeholder = " + placeholder);
                 String replacementString;
                 if (transformJSON.has(placeholder)) {
                     replacementString = transform(source, transformJSON, placeholder, parameters);
@@ -71,8 +78,7 @@ public class JSONTransformer {
                     try {
                         Object replacement = jsonPathEvaluator.evaluate(match, placeholder);
                         replacementString = parseObjectToString(replacement, wrappedInQuotes);
-                    }
-                    catch (com.jayway.jsonpath.PathNotFoundException ex){
+                    } catch (com.jayway.jsonpath.PathNotFoundException ex) {
                         replacementString = "null";
                     }
                 }
@@ -85,8 +91,18 @@ public class JSONTransformer {
                 partial = partial.replace("\"${" + placeholder + "}\"", parseObjectToString(replacement, true));
             }
             result.append(partial);
+            if (resultIsArray) {
+                result.append(",");
+            }
         }
-        return result.toString();
+        String resultString = result.toString();
+        if(resultIsArray){
+            if(resultString.endsWith(",")){
+                resultString = resultString.substring(0, resultString.length()-1);
+            }
+            resultString = resultString + "]";
+        }
+        return resultString;
     }
 
     private String parseObjectToString(Object object, boolean wrapInQuotes) {
