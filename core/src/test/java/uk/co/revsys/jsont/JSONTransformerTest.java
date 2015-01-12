@@ -3,6 +3,7 @@ package uk.co.revsys.jsont;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -58,6 +59,11 @@ public class JSONTransformerTest {
         expResult = "{\"id\": 19752}";
         result = instance.transform(source, transform, null);
         assertEquals(new JSONObject(expResult).toString(), new JSONObject(result).toString());
+        source = "[{\"value\": 1}, {\"value\": 2}]";
+        transform = "{\"$\": {\"test\": \"{{$.value}}\"}}";
+        expResult = "[{\"test\": 1}, {\"test\": 2}]";
+        result = instance.transform(source, transform, null);
+        assertEquals(new JSONArray(expResult).toString(), new JSONArray(result).toString());
     }
 
 
