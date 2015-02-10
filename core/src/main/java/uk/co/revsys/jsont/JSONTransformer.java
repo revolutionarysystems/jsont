@@ -11,7 +11,11 @@ import org.json.JSONObject;
 
 public class JSONTransformer {
 
-    private JSONPathEvaluator jsonPathEvaluator = new JSONPathEvaluator();
+    private final JSONPathEvaluator jsonPathEvaluator;
+
+    public JSONTransformer(JSONPathEvaluator jsonPathEvaluator) {
+        this.jsonPathEvaluator = jsonPathEvaluator;
+    }
 
     public String transformFromFile(String source, File transform, Map parameters) throws IOException {
         return transform(source, FileUtils.readFileToString(transform), parameters);
@@ -96,9 +100,9 @@ public class JSONTransformer {
             }
         }
         String resultString = result.toString();
-        if(resultIsArray){
-            if(resultString.endsWith(",")){
-                resultString = resultString.substring(0, resultString.length()-1);
+        if (resultIsArray) {
+            if (resultString.endsWith(",")) {
+                resultString = resultString.substring(0, resultString.length() - 1);
             }
             resultString = resultString + "]";
         }
