@@ -1,6 +1,7 @@
 
 package uk.co.revsys.jsont;
 
+import uk.co.revsys.jsont.jexl.JEXLJSONPathEvaluator;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -63,12 +64,15 @@ public class JSONPathEvaluatorTest {
     public void testEvaluateExpression() {
         String json = "{a: 1, b: 2, c:3}";
         String jpath = "eval(v1 + v2, $.a, $.b)";
-        JSONPathEvaluator instance = new JSONPathEvaluator();
+        JSONPathEvaluator instance = new JEXLJSONPathEvaluator();
         Object result = instance.evaluate(json, jpath);
         assertEquals(3, result);
         assertEquals(6, instance.evaluate(json, "eval(v1 + v2 + v3, $.a, $.b, $.c)"));
         assertEquals(6, instance.evaluate(json, "eval(v1 * v2, $.b, $.c)"));
         assertEquals(12, instance.evaluate(json, "eval((v1 * v2) * v1, $.b, $.c)"));
+        assertEquals(12, instance.evaluate(json, "eval((v1 * v2) * v1, $.b, $.c)"));
+        assertEquals(4.0d, instance.evaluate(json, "eval(math.pow(v1, 2), $.b)"));
+        assertEquals("", instance.evaluate(json, "eval(util.toStringSafe(v1), $.d)"));
     }
 
 }
