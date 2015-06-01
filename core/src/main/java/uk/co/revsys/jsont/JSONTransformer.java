@@ -13,6 +13,10 @@ public class JSONTransformer {
 
     private final JSONPathEvaluator jsonPathEvaluator;
 
+    public JSONTransformer() {
+        this.jsonPathEvaluator = new JSONPathEvaluator();
+    }
+
     public JSONTransformer(JSONPathEvaluator jsonPathEvaluator) {
         this.jsonPathEvaluator = jsonPathEvaluator;
     }
