@@ -11,7 +11,7 @@
     <parent>
         <groupId>uk.co.revsys.jsont</groupId>
         <artifactId>jsont-parent</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>0.3.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>uk.co.revsys.jsont</groupId>
             <artifactId>jsont</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.3.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
