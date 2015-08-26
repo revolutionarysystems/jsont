@@ -2,8 +2,6 @@ package uk.co.revsys.jsont;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import net.minidev.json.JSONArray;
 import org.apache.commons.io.FileUtils;
@@ -11,12 +9,12 @@ import org.json.JSONObject;
 
 public class JSONTransformer {
 
-    private final JSONPathEvaluator jsonPathEvaluator;
+    private JSONPathEvaluator jsonPathEvaluator;
 
     public JSONTransformer(JSONPathEvaluator jsonPathEvaluator) {
         this.jsonPathEvaluator = jsonPathEvaluator;
     }
-
+    
     public String transformFromFile(String source, File transform, Map parameters) throws IOException {
         return transform(source, FileUtils.readFileToString(transform), parameters);
     }
@@ -29,98 +27,91 @@ public class JSONTransformer {
     }
 
     private String transform(String source, JSONObject transformJSON, String jpath, Map parameters) {
-        String template;
         Object templateObject = transformJSON.get(jpath);
-        if (templateObject instanceof String) {
-            template = "\"" + transformJSON.get(jpath).toString() + "\"";
-        } else {
-            template = transformJSON.get(jpath).toString();
-        }
-        StringBuilder result = new StringBuilder();
-        List<String> matches = new LinkedList();
-        Object jmatch = jsonPathEvaluator.evaluate(source, jpath);
-        boolean resultIsArray = false;
-        if (jmatch instanceof net.minidev.json.JSONObject) {
-            matches.add(jmatch.toString());
-        } else if (jmatch instanceof net.minidev.json.JSONArray) {
-            JSONArray jsonArray = (JSONArray) jmatch;
-            for (Object item : jsonArray) {
-                matches.add(item.toString());
-            }
-            resultIsArray = true;
-            result.append("[");
-        } else {
-            matches = (List) jmatch;
-        }
-        for (String match : matches) {
-            String partial = template;
-            while (partial.contains("{{")) {
-                boolean hasQuoteAtStart = false;
-                boolean hasQuoteAtEnd = false;
-                boolean wrappedInQuotes = false;
-                String prefix = "{{";
-                String suffix = "}}";
-                int startIndex = partial.indexOf("{{");
-                if (startIndex > 0 && partial.charAt(startIndex - 1) == '\"') {
-                    hasQuoteAtStart = true;
-                }
-                String placeholder = partial.substring(startIndex + 2);
-                int endIndex = placeholder.indexOf("}}");
-                if (endIndex < placeholder.length() && placeholder.charAt(endIndex + 2) == '\"') {
-                    hasQuoteAtEnd = true;
-                    wrappedInQuotes = hasQuoteAtStart;
-                    if (wrappedInQuotes) {
-                        prefix = "\"{{";
-                        suffix = "}}\"";
-                    }
-                }
-                placeholder = placeholder.substring(0, endIndex);
-                String replacementString;
-                if (transformJSON.has(placeholder)) {
-                    replacementString = transform(source, transformJSON, placeholder, parameters);
-                } else {
-                    try {
-                        Object replacement = jsonPathEvaluator.evaluate(match, placeholder);
-                        replacementString = parseObjectToString(replacement, wrappedInQuotes);
-                    } catch (com.jayway.jsonpath.PathNotFoundException ex) {
-                        replacementString = "null";
-                    }
-                }
-                partial = partial.replace(prefix + placeholder + suffix, replacementString);
-            }
-            while (partial.contains("\"${")) {
-                String placeholder = partial.substring(partial.indexOf("\"${") + 3);
-                placeholder = placeholder.substring(0, placeholder.indexOf("}\""));
-                Object replacement = parameters.get(placeholder);
-                partial = partial.replace("\"${" + placeholder + "}\"", parseObjectToString(replacement, true));
-            }
-            result.append(partial);
-            if (resultIsArray) {
-                result.append(",");
-            }
-        }
-        String resultString = result.toString();
-        if (resultIsArray) {
-            if (resultString.endsWith(",")) {
-                resultString = resultString.substring(0, resultString.length() - 1);
-            }
-            resultString = resultString + "]";
-        }
-        return resultString;
+        Object match = jsonPathEvaluator.evaluate(source, jpath);
+        return transform(source, transformJSON, jpath, templateObject, match, parameters);
     }
 
-    private String parseObjectToString(Object object, boolean wrapInQuotes) {
-        if (object == null) {
-            return "null";
-        } else if (object instanceof String) {
-            if (wrapInQuotes) {
-                return "\"" + object.toString() + "\"";
-            } else {
-                return object.toString();
+    private String transform(String source, JSONObject transform, String jpath, Object templateObject, Object match, Map parameters) {
+        if (match instanceof net.minidev.json.JSONObject) {
+            if (templateObject instanceof String) {
+                return parseString(source, transform, jpath, (String) templateObject, parameters);
+            } else if (templateObject instanceof JSONObject) {
+                JSONObject template = (JSONObject) templateObject;
+                if (template.length() == 0) {
+                    return "{}";
+                }
+                String result = "{";
+                for (Object k : template.keySet()) {
+                    String key = (String) k;
+                    if (key.startsWith("$copy")) {
+                        String path = template.getString(key);
+                        net.minidev.json.JSONObject target = (net.minidev.json.JSONObject) jsonPathEvaluator.evaluate(source, path);
+                        String targetString = target.toString();
+                        targetString = targetString.substring(1, targetString.length() - 1);
+                        result = result + targetString + ",";
+                    } else {
+                        Object templatePartial = template.get(key);
+                        result = result + "\"" + key + "\":" + transform(source, transform, jpath, templatePartial, match, parameters) + ",";
+                    }
+                }
+                return result.substring(0, result.length() - 1) + "}";
             }
-        } else {
-            return object.toString();
+            return null;
+        } else if (match instanceof JSONArray){
+            JSONArray jarray = (JSONArray)match;
+            if(jarray.isEmpty()){
+                return "[]";
+            }
+            String result = "[";
+            for(int i=0; i<jarray.size(); i++){
+                Object item = jarray.get(i);
+                result = result + transform(source, transform, jpath + "[" + i + "]", templateObject, item, parameters) + ",";
+            }
+            return result.substring(0, result.length()-1) + "]";
+        }else {
+            return null;
         }
+    }
+
+    private String parseString(String json, JSONObject transform, String path, String s, Map parameters) {
+        boolean wrapInQuotes = false;
+        while (s.contains("{{")) {
+            String placeholder = s.substring(s.indexOf("{{") + 2);
+            placeholder = placeholder.substring(0, placeholder.indexOf("}}"));
+            String jpath = placeholder;
+            if(jpath.startsWith("$$")){
+                jpath = jpath.substring(1);
+            }else if(jpath.startsWith("$")){
+                jpath = path + jpath.substring(1);
+            }
+            System.out.println("jpath = " + jpath);
+            if(transform.has(jpath) && !jpath.equals(path)){
+                return transform(json, transform, jpath, parameters);
+            }
+            Object result = jsonPathEvaluator.evaluate(json, jpath);
+            if(result == null){
+                result = "null";
+            }else if(result instanceof String) {
+                wrapInQuotes = true;
+            }
+            s = s.replace("{{" + placeholder + "}}", result.toString());
+        }
+        while (s.contains("${")) {
+            String placeholder = s.substring(s.indexOf("${") + 2);
+            placeholder = placeholder.substring(0, placeholder.indexOf("}"));
+            Object replacement = parameters.get(placeholder);
+            if(replacement == null){
+                replacement = "null";
+            }else if(replacement instanceof String) {
+                wrapInQuotes = true;
+            }
+            s = s.replace("${" + placeholder + "}", replacement.toString());
+        }
+        if (wrapInQuotes) {
+            s = "\"" + s + "\"";
+        }
+        return s;
     }
 
 }
