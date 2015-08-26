@@ -11,6 +11,10 @@ public class JSONTransformer {
 
     private JSONPathEvaluator jsonPathEvaluator;
 
+    public JSONTransformer() {
+        this.jsonPathEvaluator = new JSONPathEvaluator();
+    }
+
     public JSONTransformer(JSONPathEvaluator jsonPathEvaluator) {
         this.jsonPathEvaluator = jsonPathEvaluator;
     }
@@ -23,7 +27,14 @@ public class JSONTransformer {
         JSONObject transformJSON = new JSONObject(transform);
         Object key = transformJSON.keySet().toArray()[0];
         String jpath = (String) key;
-        return transform(source, transformJSON, jpath, parameters);
+        String result = transform(source, transformJSON, jpath, parameters);
+        if(result.startsWith("{")){
+            return new JSONObject(result).toString();
+        }else if(result.startsWith("[")){
+            return new org.json.JSONArray(result).toString();
+        }else{
+            return result;
+        }
     }
 
     private String transform(String source, JSONObject transformJSON, String jpath, Map parameters) {
