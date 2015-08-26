@@ -41,12 +41,18 @@ public class JSONTransformerTest {
     @Test
     public void testTransform() throws Exception{
         JSONTransformer instance = new JSONTransformer(new JSONPathEvaluator());
-        String source = "{\"accountName\": \"Test Account\", \"accountId\": 9876, \"user\": {\"firstName\": \"Test\", \"surname\": \"User\"}}";
-        String transform = "{\"$\": {\"name\": \"{{$.accountName}}\", \"id\": \"{{$.accountId}}\", \"userid\": \"${userid}\", \"p1\": \"{{$.p1}}\", \"p2\": \"${p2}\", \"p3\": \"static\"}}";
-        String expResult = "{\"name\": \"Test Account\", \"id\": 9876, \"userid\": \"1234\", \"p1\": null, \"p2\": null, \"p3\": \"static\"}";
+        String source = "{\"a\": 1}";
+        String transform = "{\"$\": {\"type\": \"Test\", \"a\": \"{{$.a}}\"}}";
+        String expResult = "{\"a\": 1, \"type\": \"Test\"}";
+        String result = instance.transform(source, transform, null);
+        assertTrue(result.contains("\"Test\""));
+        assertEquals(new JSONObject(expResult).toString(), new JSONObject(result).toString());
+        source = "{\"accountName\": \"Test Account\", \"accountId\": 9876, \"user\": {\"firstName\": \"Test\", \"surname\": \"User\"}}";
+        transform = "{\"$\": {\"name\": \"{{$.accountName}}\", \"id\": \"{{$.accountId}}\", \"userid\": \"${userid}\", \"p1\": \"{{$.p1}}\", \"p2\": \"${p2}\", \"p3\": \"static\"}}";
+        expResult = "{\"name\": \"Test Account\", \"id\": 9876, \"userid\": \"1234\", \"p1\": null, \"p2\": null, \"p3\": \"static\"}";
         Map parameters = new HashMap();
         parameters.put("userid", "1234");
-        String result = instance.transform(source, transform, parameters);
+        result = instance.transform(source, transform, parameters);
         assertEquals(new JSONObject(expResult).toString(), new JSONObject(result).toString());
         transform = "{\"$\": {\"accountName\": \"{{$.accountName}} 1\", \"user\": \"{{$.user}}\"}, \"$.user\": {\"id\": \"${userid}\", \"name\": \"{{$.firstName}} {{$.surname}}\"}}";
         expResult = "{\"accountName\": \"Test Account 1\", \"user\": {\"id\": \"1234\", \"name\": \"Test User\"}}";
