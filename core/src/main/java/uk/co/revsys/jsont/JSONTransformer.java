@@ -1,7 +1,10 @@
 package uk.co.revsys.jsont;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import net.minidev.json.JSONArray;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
 public class JSONTransformer {
@@ -10,6 +13,10 @@ public class JSONTransformer {
 
     public JSONTransformer(JSONPathEvaluator jsonPathEvaluator) {
         this.jsonPathEvaluator = jsonPathEvaluator;
+    }
+    
+    public String transformFromFile(String source, File transform, Map parameters) throws IOException {
+        return transform(source, FileUtils.readFileToString(transform), parameters);
     }
 
     public String transform(String source, String transform, Map parameters) {
