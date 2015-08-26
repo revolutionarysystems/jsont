@@ -42,8 +42,8 @@ public class JSONTransformerTest {
     public void testTransform() throws Exception{
         JSONTransformer instance = new JSONTransformer(new JSONPathEvaluator());
         String source = "{\"a\": 1}";
-        String transform = "{\"$\": {\"type\": \"Test\", \"a\": \"{{$.a}}\"}}";
-        String expResult = "{\"a\": 1, \"type\": \"Test\"}";
+        String transform = "{\"$\": {\"type\": \"Test\", \"a\": \"{{$.a}}\", \"b\": \"{{$.b.c}}\"}}";
+        String expResult = "{\"a\": 1, \"type\": \"Test\", \"b\": null}";
         String result = instance.transform(source, transform, null);
         assertTrue(result.contains("\"Test\""));
         assertEquals(new JSONObject(expResult).toString(), new JSONObject(result).toString());
@@ -65,6 +65,11 @@ public class JSONTransformerTest {
         instance = new JSONTransformer(new JEXLJSONPathEvaluator());
         transform = "{\"$\": {\"id\": \"{{eval(v1 + v1, $.accountId)}}\"}}";
         expResult = "{\"id\": 19752}";
+        result = instance.transform(source, transform, null);
+        assertEquals(new JSONObject(expResult).toString(), new JSONObject(result).toString());
+        source = FileUtils.readFileToString(new File("src/test/resources/source.json"));
+        transform = FileUtils.readFileToString(new File("src/test/resources/transform.json"));
+        expResult = "{\"a\": \"abcd,\"}";
         result = instance.transform(source, transform, null);
         assertEquals(new JSONObject(expResult).toString(), new JSONObject(result).toString());
         source = "[{\"value\": 1}, {\"value\": 2}]";

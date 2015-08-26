@@ -62,7 +62,7 @@ public class JSONPathEvaluatorTest {
     
     @Test
     public void testEvaluateExpression() {
-        String json = "{a: 1, b: 2, c:3}";
+        String json = "{a: 1, b: 2, c:3, d: \"abc\\\\d\"}";
         String jpath = "eval(v1 + v2, $.a, $.b)";
         JSONPathEvaluator instance = new JEXLJSONPathEvaluator();
         Object result = instance.evaluate(json, jpath);
@@ -72,7 +72,9 @@ public class JSONPathEvaluatorTest {
         assertEquals(12, instance.evaluate(json, "eval((v1 * v2) * v1, $.b, $.c)"));
         assertEquals(12, instance.evaluate(json, "eval((v1 * v2) * v1, $.b, $.c)"));
         assertEquals(4.0d, instance.evaluate(json, "eval(math.pow(v1, 2), $.b)"));
-        assertEquals("", instance.evaluate(json, "eval(util.toStringSafe(v1), $.d)"));
+        assertEquals("", instance.evaluate(json, "eval(util.toStringSafe(v1), $.e)"));
+        assertEquals("abcd", instance.evaluate(json, "eval(v1.replace('\\\\', ''), $.d)"));
+        assertEquals("abcd,", instance.evaluate(json, "eval(v1.replace('\\\\', '') + ',', $.d)"));
     }
 
 }
