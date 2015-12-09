@@ -91,4 +91,18 @@ public class JSONTransformerTest {
     }
 
 
+    @Test
+    public void testTransformOverrideCopiedField() throws Exception{
+        JSONTransformer instance = new JSONTransformer(new JSONPathEvaluator());
+        String source = "{\"accountName\": \"Test Account\", \"accountId\": 9876, \"fullName\": \"Test User\", \"user\": {\"firstName\": \"Test\", \"surname\": \"User\"}}";
+        String transform = "{\"$\": {\"$copy\": \"$\",\"fullName\":\"My Override\"}}";
+        String expResult = "{\"accountName\": \"Test Account\", \"accountId\": 9876, \"fullName\": \"My Override\", \"user\": {\"firstName\": \"Test\", \"surname\": \"User\"}}";
+        Map parameters = new HashMap();
+        parameters.put("userid", "1234");
+        String result = instance.transform(source, transform, parameters);
+        System.out.println(result);
+        assertEquals(new JSONObject(expResult).toString(), new JSONObject(result).toString());
+    }
+    
+    
 }

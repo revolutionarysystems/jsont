@@ -60,6 +60,13 @@ public class JSONTransformer {
                         String path = template.getString(key);
                         try {
                             net.minidev.json.JSONObject target = (net.minidev.json.JSONObject) jsonPathEvaluator.evaluate(source, path);
+                            for (Object sk : template.keySet()) {
+                                String subkey = (String) sk;
+                                if(target.containsKey(subkey)){
+                                    target.remove(subkey);
+                                }
+                            }
+                            
                             String targetString = target.toString();
                             targetString = targetString.substring(1, targetString.length() - 1);
                             result = result + targetString + ",";

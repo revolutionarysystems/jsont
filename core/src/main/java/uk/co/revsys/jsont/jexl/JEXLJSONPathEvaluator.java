@@ -61,14 +61,14 @@ public class JEXLJSONPathEvaluator extends JSONPathEvaluator{
         Collections.reverse(jpaths);
         for(String jpath: jpaths){
             Object result = evaluate(json, jpath);
-            System.out.println("result = " + result);
+            //System.out.println("result = " + result);
             context.set("v" + i, result);
             i = i + 1;
         }
-        System.out.println("expression = " + expression);
+        //System.out.println("expression = " + expression);
         Expression exp = jexlEngine.createExpression(expression);
         Object result = exp.evaluate(context);
-        System.out.println("result = " + result);
+        //System.out.println("result = " + result);
         return result;
     }
 
